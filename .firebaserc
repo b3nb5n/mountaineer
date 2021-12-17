@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "mountaineer-154c6"
+  },
+  "targets": {
+    "mountaineer-154c6": {
+      "hosting": {
+        "teacher": [
+          "mountaineer-teacher"
+        ],
+        "student": [
+          "mountaineer-student"
+        ]
+      }
+    }
+  }
+}

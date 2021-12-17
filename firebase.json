@@ -1,0 +1,37 @@
+{
+	"hosting": [
+		{
+			"target": "student",
+			"public": "frontend/student/build",
+			"trailingSlashes": false,
+			"rewrites": [
+				{
+					"source": "**",
+					"destination": "/index.html",
+					"type": 301
+				}
+			]
+		},
+		{
+			"target": "teacher",
+			"public": "frontend/teacher/build",
+			"cleanUrls": true,
+			"trailingSlashes": false,
+			"rewrites": [
+				{
+					"source": "**",
+					"destination": "/index.html",
+					"type": 301
+				}
+			]
+		}
+	],
+	"emulators": {
+		"hosting": {
+			"port": 5500
+		},
+		"ui": {
+			"enabled": true
+		}
+	}
+}
