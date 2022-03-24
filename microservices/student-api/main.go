@@ -1,14 +1,16 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"fmt"
 	"log"
-	"os"
+	"time"
 
 	"shared"
 
-	f "github.com/fauna/faunadb-go/v4/faunadb"
-	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 type StudentData struct {
@@ -17,42 +19,26 @@ type StudentData struct {
 
 type Student shared.Resource[StudentData]
 
-var (
-	secret = os.Getenv("FAUNADB_SECRET")
-	endpoint = os.Getenv("FAUNADB_ENDPOINT")
-)
-
 func main() {
-	if secret == "" {
-		log.Fatalln("Missing database secret")
-	} else if endpoint == "" {
-		endpoint = "https://db.fauna.com/"
-		// log.Fatalln("Missing database endpoint")
+	endpoint := "mongodb://localhost:27017"
+
+	ctx, cancelDbCtx := context.WithTimeout(context.Background(), 30 * time.Second)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(endpoint))
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
 	}
 
-	client := f.NewFaunaClient(secret, f.Endpoint(endpoint))
-
-	app := fiber.New()
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		result, err := client.Query(f.Get(f.Ref(f.Collection("students"))))
-		if err != nil {
-			return c.SendString("Error querying db" + err.Error())
+	defer (func() {
+		cancelDbCtx()
+		if err := client.Disconnect(context.Background()); err != nil {
+			log.Fatalf("Error disconnecting from database: %v", err)
 		}
+	})()
 
-		var student Student
-		err = result.Get(&student)
-		if err != nil {
-			return c.SendString("Error getting" + err.Error())
-		}
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		log.Fatalf("Error pinging db: %v", err)
+	}
 
-		data, err := json.Marshal(student)
-		if err != nil {
-			return c.SendString(err.Error())
-		}
-
-		return c.SendString(string(data))
-	})
-
-	app.Listen(":3000")
+	fmt.Println("connected")
 }
