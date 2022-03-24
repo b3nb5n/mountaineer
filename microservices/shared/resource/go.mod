@@ -1,3 +1,3 @@
-module benbaldwin.dev/mountaineer/shared/resource
+module resource
 
 go 1.18
