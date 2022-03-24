@@ -1,3 +1,6 @@
 go 1.18
 
-use ./student-api
+use (
+	./shared/resource
+	./student-api
+)
