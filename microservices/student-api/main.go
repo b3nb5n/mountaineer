@@ -5,14 +5,17 @@ import (
 	"log"
 	"os"
 
+	"shared"
+
 	f "github.com/fauna/faunadb-go/v4/faunadb"
 	"github.com/gofiber/fiber/v2"
 )
 
-type Student struct {
-	Meta map[string]interface{} `json:"meta"`
-	Data map[string]interface{} `json:"data"`
+type StudentData struct {
+
 }
+
+type Student shared.Resource[StudentData]
 
 var (
 	secret = os.Getenv("FAUNADB_SECRET")

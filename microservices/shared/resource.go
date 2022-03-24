@@ -1,4 +1,4 @@
-package resource
+package shared
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 )
 
 type Visibility int
+
 const (
 	Live Visibility = iota
 	Draft
@@ -18,6 +19,14 @@ type ResourceMeta struct {
 	Created time.Time `json:"created"`
 	Edited time.Time `json:"edited"`
 	Visibility Visibility `json:"visibility"`
+}
+
+func NewResourceMeta() *ResourceMeta {
+	now := time.Now()
+	return &ResourceMeta{
+		Created: now,
+		Edited: now,
+	}
 }
 
 func (meta *ResourceMeta) MarshalJSON() ([]byte, error) {
@@ -55,6 +64,20 @@ func (meta *ResourceMeta) UnmarshalJSON(data []byte) error {
 }
 
 type Resource[T any] struct {
+	ID Snowflake `json:"_id"`
 	Meta ResourceMeta `json:"meta"`
 	Data T `json:"data"`
+}
+
+func NewResource[T any](data T) (*Resource[T], error) {
+	snowflake, err := NewSnowflake()
+	if err != nil {
+		return nil, fmt.Errorf("Error generating snowflake: %v", err)
+	}
+
+	return &Resource[T]{
+		ID: snowflake,
+		Meta: *NewResourceMeta(),
+		Data: data,
+	}, err
 }

@@ -1,8 +1,9 @@
-package resource
+package shared_test
 
 import (
 	"encoding/json"
 	"fmt"
+	"shared"
 	"testing"
 	"time"
 )
@@ -11,7 +12,7 @@ func Fuzz_ResourceMeta_MarshalJSON(f *testing.F) {
 	f.Add(time.Now().Unix())
 
 	f.Fuzz(func(t *testing.T, created int64) {
-		meta := ResourceMeta { Created: time.Unix(created, 0) }
+		meta := shared.ResourceMeta { Created: time.Unix(created, 0) }
 
 		data, err := json.Marshal(&meta)
 		if err != nil {
@@ -49,7 +50,7 @@ func Fuzz_ResourceMeta_UnmarshalJSON(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, created int64) {
 		data := []byte(fmt.Sprintf("{\"created\":%v,\"edited\":0,\"visibility\":0}", created))
-		var meta ResourceMeta
+		var meta shared.ResourceMeta
 		err := json.Unmarshal(data, &meta)
 		if err != nil {
 			t.Errorf("Error unmarshaling json: %v", err)
